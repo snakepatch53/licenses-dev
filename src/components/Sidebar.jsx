@@ -1,7 +1,7 @@
-import "./index.css";
+import "./Sidebar.css";
 import PropTypes from "prop-types";
 import { NavLink } from "react-router-dom";
-import { useOpen } from "../../hooks/sidebar";
+import { useOpen } from "../hooks/sidebar";
 
 Sidebar.propTypes = {
     toggleSidebar: PropTypes.func.isRequired,
@@ -37,21 +37,15 @@ export default function Sidebar({ toggleSidebar, title: prop_title }) {
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/profile">
-                            <i className="fa fa-user"></i>
-                            <span>Profile</span>
+                        <NavLink to="/users">
+                            <i className="fa fa-users"></i>
+                            <span>Users</span>
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/messages">
-                            <i className="fa fa-envelope"></i>
-                            <span>Messages</span>
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/settings">
-                            <i className="fa fa-cog"></i>
-                            <span>Settings</span>
+                        <NavLink to="/survey">
+                            <i className="fa fa-question"></i>
+                            <span>Survey</span>
                         </NavLink>
                     </li>
                 </ul>

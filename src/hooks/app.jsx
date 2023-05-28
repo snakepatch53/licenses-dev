@@ -7,5 +7,5 @@ export function useOpenSidebar() {
         setOpenSidebar(isOpen);
         return isOpen;
     };
-    return { openSidebar, handleOpenSidebar };
+    return { openSidebar, handleOpenSidebar, cssClass: !openSidebar ? " close-sidebar" : "" };
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./index.css";
+import "./Header.css";
 
 export default function Header() {
     const [showMenu, setShowMenu] = useState(false);
