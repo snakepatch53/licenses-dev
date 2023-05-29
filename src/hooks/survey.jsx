@@ -18,6 +18,10 @@ export function useResult({ filters, selectedFilter, selectedLimit, valueSearch 
         setSurveysFiltered(result2);
     }, [selectedFilter, valueSearch, surveys, filters]);
 
+    const insertSurvey = (newSurvey) => {
+        setSurveys([...surveys, newSurvey]);
+    };
+
     const updateSurvey = (newSurvey) => {
         setSurveys([...surveys.map((_survey) => (_survey.survey_id == newSurvey.survey_id ? newSurvey : _survey))]);
     };
@@ -30,6 +34,7 @@ export function useResult({ filters, selectedFilter, selectedLimit, valueSearch 
     const results = surveysFiltered || surveys;
     return {
         surveys: results.slice(0, selectedLimit == "all" ? results.length : selectedLimit),
+        insertSurvey,
         updateSurvey,
         deleteSurvey,
     };

@@ -5,7 +5,7 @@ import ItemsSurvey from "../components/ItemsSurvey";
 import { useFilter, useSearch } from "../hooks/search";
 import { useResult } from "../hooks/survey";
 import { useEffect, useState } from "react";
-import { insert as insertSurvey, update as updateSurveyDb, dell as deleteSurveyDb } from "../api/survey";
+import { insert as insertSurveyDb, update as updateSurveyDb, dell as deleteSurveyDb } from "../api/survey";
 
 export default function Survey() {
     const [showModal, setShowModal] = useState(false);
@@ -21,7 +21,7 @@ export default function Survey() {
         defaultLabel: limits[0].label,
         defaultFilter: limits[0].value,
     });
-    const { surveys, updateSurvey, deleteSurvey } = useResult({
+    const { surveys, insertSurvey, updateSurvey, deleteSurvey } = useResult({
         filters,
         selectedFilter: filterSelected,
         selectedLimit: limitSelected,
@@ -76,7 +76,7 @@ export default function Survey() {
                             surveys={surveys}
                         />
                     ) : (
-                        <Edit back={() => setMode("table")} edit_id={edit_id} surveys={surveys} updateSurvey={updateSurvey} />
+                        <Edit back={() => setMode("table")} edit_id={edit_id} surveys={surveys} insertSurvey={insertSurvey} updateSurvey={updateSurvey} />
                     )}
                 </div>
             </div>
@@ -116,7 +116,7 @@ function ModalDelete({ show, setClose, onClickYes, onClickNo }) {
 }
 
 Edit.propTypes = null;
-function Edit({ back, edit_id, surveys, updateSurvey }) {
+function Edit({ back, edit_id, surveys, insertSurvey, updateSurvey }) {
     const [msg, setMsg] = useState("");
     const [survey, setSurvey] = useState({
         survey_id: 0,
@@ -148,13 +148,14 @@ function Edit({ back, edit_id, surveys, updateSurvey }) {
             return;
         }
         const formData = new FormData(e.target);
-        const response = edit_id == 0 ? await insertSurvey(formData) : await updateSurveyDb(formData);
+        const response = edit_id == 0 ? await insertSurveyDb(formData) : await updateSurveyDb(formData);
         setMsg(response.message);
         setTimeout(() => setMsg(""), 3000);
         if (response.response) {
             const newSurvey = { ...survey, survey_id: response.data };
             if (newSurvey.survey_image) newSurvey.survey_image_url = URL.createObjectURL(newSurvey.survey_image);
-            updateSurvey(newSurvey);
+            if (edit_id == 0) insertSurvey(newSurvey);
+            else updateSurvey(newSurvey);
             back();
         }
     };
