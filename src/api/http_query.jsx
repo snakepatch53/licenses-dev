@@ -8,7 +8,7 @@ export async function http_query(table, action, method, data = null) {
         console.error("Error:", error);
         return false;
     });
-    if (!response) return !true;
+    if (!response) return false;
     const json = await response.json();
     return json;
 }
