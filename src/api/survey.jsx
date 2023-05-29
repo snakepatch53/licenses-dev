@@ -6,6 +6,18 @@ export async function select() {
     return schematize(response.data);
 }
 
+export async function insert(formData) {
+    const response = await http_query("survey", "insert", "POST", formData);
+    if (!response) return [];
+    return response;
+}
+
+export async function update(formData) {
+    const response = await http_query("survey", "update", "POST", formData);
+    if (!response) return [];
+    return response;
+}
+
 function schematize(rows) {
     return rows.map((row) => {
         return {

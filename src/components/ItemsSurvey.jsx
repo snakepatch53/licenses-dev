@@ -2,19 +2,20 @@ import "./ItemsSurvey.css";
 
 ItemsSurvey.propTypes = null;
 
-export default function ItemsSurvey({ surveys }) {
+export default function ItemsSurvey({ surveys, handleClickEdit }) {
     return (
         <ul className="items-surveys">
-            {surveys.map((survey) => (
-                <Item key={survey["survey_id"]} info={survey} />
-            ))}
+            {surveys.map((survey) => {
+                // console.log(survey["survey_id"]);
+                return <Item key={survey["survey_id"]} info={survey} handleClickEdit={handleClickEdit} />;
+            })}
         </ul>
     );
 }
 
 Item.propTypes = null;
 
-function Item({ info }) {
+function Item({ info, handleClickEdit }) {
     const { survey_id, survey_question, survey_answer, survey_image_url } = info;
     return (
         <li>
@@ -41,7 +42,7 @@ function Item({ info }) {
                 </div>
             )}
             <div className="actions">
-                <button className="edit">
+                <button className="edit" onClick={() => handleClickEdit(survey_id)}>
                     <i className="fas fa-edit"></i>
                 </button>
                 <button className="dell">
