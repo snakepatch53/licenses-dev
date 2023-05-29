@@ -22,10 +22,16 @@ export function useResult({ filters, selectedFilter, selectedLimit, valueSearch 
         setSurveys([...surveys.map((_survey) => (_survey.survey_id == newSurvey.survey_id ? newSurvey : _survey))]);
     };
 
+    const deleteSurvey = (survey_id) => {
+        const response = surveys.filter((survey) => survey.survey_id !== survey_id);
+        setSurveys(response);
+    };
+
     const results = surveysFiltered || surveys;
     return {
         surveys: results.slice(0, selectedLimit == "all" ? results.length : selectedLimit),
         updateSurvey,
+        deleteSurvey,
     };
 }
 

@@ -5,9 +5,12 @@ import ItemsSurvey from "../components/ItemsSurvey";
 import { useFilter, useSearch } from "../hooks/search";
 import { useResult } from "../hooks/survey";
 import { useEffect, useState } from "react";
-import { insert as insertSurvey, update as updateSurveyDb } from "../api/survey";
+import { insert as insertSurvey, update as updateSurveyDb, dell as deleteSurveyDb } from "../api/survey";
 
 export default function Survey() {
+    const [showModal, setShowModal] = useState(false);
+    const [selectedSurvey_id, setSelectedSurvey_id] = useState(0);
+
     const { valueSearch, handleSearch } = useSearch();
 
     const [filterSelectedLabel, filterSelected, filterOnSelection, isFilterSelected] = useFilter({
@@ -18,7 +21,7 @@ export default function Survey() {
         defaultLabel: limits[0].label,
         defaultFilter: limits[0].value,
     });
-    const { surveys, updateSurvey } = useResult({
+    const { surveys, updateSurvey, deleteSurvey } = useResult({
         filters,
         selectedFilter: filterSelected,
         selectedLimit: limitSelected,
@@ -33,6 +36,23 @@ export default function Survey() {
         setMode("edit");
     };
 
+    const handleClickDelete = (id) => {
+        setShowModal(true);
+        setMode("table");
+        setSelectedSurvey_id(id);
+    };
+
+    const handleDelete = async () => {
+        const formData = new FormData();
+        formData.append("survey_id", selectedSurvey_id);
+        const response = await deleteSurveyDb(formData);
+        setShowModal(false);
+        setMode("table");
+        if (response.response) {
+            deleteSurvey(selectedSurvey_id);
+        }
+    };
+
     return (
         <>
             <div className="container">
@@ -43,6 +63,7 @@ export default function Survey() {
                     {mode === "table" ? (
                         <Table
                             handleClickForm={handleClickForm}
+                            handleClickDelete={handleClickDelete}
                             limitSelectedLabel={limitSelectedLabel}
                             limitOnSelection={limitOnSelection}
                             limitSelected={limitSelected}
@@ -57,6 +78,37 @@ export default function Survey() {
                     ) : (
                         <Edit back={() => setMode("table")} edit_id={edit_id} surveys={surveys} updateSurvey={updateSurvey} />
                     )}
+                </div>
+            </div>
+            <ModalDelete show={showModal} setClose={() => setShowModal(false)} onClickYes={handleDelete} />
+        </>
+    );
+}
+
+ModalDelete.propTypes = null;
+function ModalDelete({ show, setClose, onClickYes, onClickNo }) {
+    if (!onClickNo) onClickNo = () => setClose(false);
+    return (
+        <>
+            <div className={"modal " + (show ? "open" : "")}>
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h2>Eliminar</h2>
+                        <span className="close" onClick={onClickNo}>
+                            &times;
+                        </span>
+                    </div>
+                    <div className="modal-body">
+                        <p>¿Estás seguro de eliminar este registro?</p>
+                    </div>
+                    <div className="modal-footer">
+                        <button className="btn edit" onClick={onClickYes}>
+                            Eliminar
+                        </button>
+                        <button className="btn delete" onClick={onClickNo}>
+                            Cancelar
+                        </button>
+                    </div>
                 </div>
             </div>
         </>
@@ -159,6 +211,7 @@ function Edit({ back, edit_id, surveys, updateSurvey }) {
 Table.propTypes = null;
 function Table({
     handleClickForm,
+    handleClickDelete,
     limitSelectedLabel,
     limitOnSelection,
     isLimitSelected,
@@ -194,7 +247,7 @@ function Table({
                 </div>
             </div>
             <div className="data">
-                <ItemsSurvey surveys={surveys} limit={limitSelected} handleClickEdit={handleClickForm} handleClickDelete={handleClickForm} />
+                <ItemsSurvey surveys={surveys} limit={limitSelected} handleClickEdit={handleClickForm} handleClickDelete={handleClickDelete} />
             </div>
         </>
     );

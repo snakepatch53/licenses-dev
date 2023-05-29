@@ -2,12 +2,12 @@ import "./ItemsSurvey.css";
 
 ItemsSurvey.propTypes = null;
 
-export default function ItemsSurvey({ surveys, handleClickEdit }) {
+export default function ItemsSurvey({ surveys, handleClickEdit, handleClickDelete }) {
     return (
         <ul className="items-surveys">
             {surveys.map((survey) => {
                 // console.log(survey["survey_id"]);
-                return <Item key={survey["survey_id"]} info={survey} handleClickEdit={handleClickEdit} />;
+                return <Item key={survey["survey_id"]} info={survey} handleClickEdit={handleClickEdit} handleClickDelete={handleClickDelete} />;
             })}
         </ul>
     );
@@ -15,7 +15,7 @@ export default function ItemsSurvey({ surveys, handleClickEdit }) {
 
 Item.propTypes = null;
 
-function Item({ info, handleClickEdit }) {
+function Item({ info, handleClickEdit, handleClickDelete }) {
     const { survey_id, survey_question, survey_answer, survey_image_url } = info;
     return (
         <li>
@@ -45,7 +45,7 @@ function Item({ info, handleClickEdit }) {
                 <button className="edit" onClick={() => handleClickEdit(survey_id)}>
                     <i className="fas fa-edit"></i>
                 </button>
-                <button className="dell">
+                <button className="dell" onClick={() => handleClickDelete(survey_id)}>
                     <i className="fas fa-trash"></i>
                 </button>
             </div>

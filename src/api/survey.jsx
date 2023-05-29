@@ -18,6 +18,12 @@ export async function update(formData) {
     return response;
 }
 
+export async function dell(formData) {
+    const response = await http_query("survey", "delete", "POST", formData);
+    if (!response) return [];
+    return response;
+}
+
 function schematize(rows) {
     return rows.map((row) => {
         return {
