@@ -1,22 +1,6 @@
 import { useState } from "react";
 
-export function useSearch({ defaultLabel = "Todos", defaultFilter = "all" }) {
-    // filter
-    const [labelSelected, setLabelSelected] = useState(defaultLabel);
-    const [filterOpen, setFilterOpen] = useState(false);
-    const [filterSelected, setFilterSelected] = useState(defaultFilter);
-    const selectFilter = (e) => {
-        setFilterSelected(e.target.value);
-        setFilterOpen(false);
-        setLabelSelected(e.target.nextSibling.innerText);
-    };
-    const openFilter = () => {
-        setFilterOpen(!filterOpen);
-    };
-    const isFilterSelected = (value) => {
-        return filterSelected === value;
-    };
-
+export function useSearch() {
     // search
     const [search, setSearch] = useState("");
     const handleSearch = (value) => {
@@ -25,13 +9,40 @@ export function useSearch({ defaultLabel = "Todos", defaultFilter = "all" }) {
 
     // exports
     return {
-        labelSelected,
-        filterOpen,
-        filterSelected,
-        selectFilter,
-        openFilter,
-        isFilterSelected,
         valueSearch: search,
         handleSearch,
     };
+}
+
+export function useFilter({ defaultLabel, defaultFilter }) {
+    // filter
+    const [labelSelected, setLabelSelected] = useState(defaultLabel);
+
+    const [filterSelected, setFilterSelected] = useState(defaultFilter);
+    const selectFilter = ({ value, label }) => {
+        setFilterSelected(value);
+        setLabelSelected(label);
+    };
+
+    const isFilterSelected = (value) => {
+        return filterSelected == value;
+    };
+
+    // exports
+    return [labelSelected, filterSelected, selectFilter, isFilterSelected];
+}
+
+export function useSelectHtml({ onSelection }) {
+    const [selectHtmlOpen, setSelectHtmlOpen] = useState(false);
+
+    const handleSelection = (e) => {
+        onSelection({ value: e.target.value, label: e.target.nextSibling.innerText });
+        setSelectHtmlOpen(false);
+    };
+
+    const toggleOpen = () => {
+        setSelectHtmlOpen(!selectHtmlOpen);
+    };
+
+    return [selectHtmlOpen ? " open" : "", handleSelection, toggleOpen];
 }

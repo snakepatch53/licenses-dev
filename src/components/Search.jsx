@@ -1,55 +1,76 @@
 import "./Search.css";
-import PropTypes from "prop-types";
-import { useSearch } from "../hooks/search";
+import { useSelectHtml } from "../hooks/search";
+// import { useState } from "react";
 
-Filter.propTypes = {
-    filters: PropTypes.arrayOf(
-        PropTypes.shape({
-            value: PropTypes.string.isRequired,
-            label: PropTypes.string.isRequired,
-        })
-    ).isRequired,
-};
+Filter.propTypes = null;
 
-export default function Filter({ filters }) {
-    const defaultLabel = filters[0].label;
-    const defaultFilter = filters[0].value;
-    const { labelSelected, filterOpen, isFilterSelected, selectFilter, openFilter, handleSearch, valueSearch } = useSearch({ defaultLabel, defaultFilter });
+export default function Filter({
+    limits,
+    limitSelectedLabel,
+    limitOnSelection,
+    isLimitSelected,
+    filters,
+    filterSelectedLabel,
+    filterOnSelection,
+    isFilterSelected,
+    handleSearch,
+    valueSearch,
+}) {
     return (
         <>
             <div className="search-component">
-                <div className={"filter " + (filterOpen ? "open" : "")}>
-                    <div className="selected" onClick={openFilter}>
-                        <b>Filtrar por: </b>
-                        <span>{labelSelected}</span>
-                        <i className="fas fa-chevron-down"></i>
-                    </div>
-                    <ul>
-                        {filters.map((filter) => (
-                            <Option key={filter.value} filter={filter} isFilterSelected={isFilterSelected} selectFilter={selectFilter} />
-                        ))}
-                    </ul>
-                </div>
+                <SelectHtml
+                    placeholder="Limite: "
+                    options={limits}
+                    optionLabelSelected={limitSelectedLabel}
+                    onSelection={limitOnSelection}
+                    isSelected={isLimitSelected}
+                />
+                <SelectHtml
+                    placeholder="Filtrar por: "
+                    options={filters}
+                    optionLabelSelected={filterSelectedLabel}
+                    onSelection={filterOnSelection}
+                    isSelected={isFilterSelected}
+                />
                 <input type="search" placeholder="Search" value={valueSearch} onChange={(e) => handleSearch(e.target.value)} />
             </div>
         </>
     );
 }
 
-Option.propTypes = {
-    filter: PropTypes.shape({
-        value: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
-    }).isRequired,
-    isFilterSelected: PropTypes.func.isRequired,
-    selectFilter: PropTypes.func.isRequired,
-};
-
-function Option({ filter, isFilterSelected, selectFilter }) {
+SelectHtml.propTypes = null;
+function SelectHtml({ placeholder, optionLabelSelected, options, onSelection, isSelected }) {
+    const [filterForClass, filterForHandleSelect, filterForToggle] = useSelectHtml({ onSelection });
     return (
-        <li key={filter.value}>
-            <input type="radio" name="filter" value={filter.value} id={"filter-" + filter.value} checked={isFilterSelected(filter.value)} onChange={selectFilter} />
-            <label htmlFor={"filter-" + filter.value}>{filter.label}</label>
+        <div className={"filter" + filterForClass}>
+            <div className="selected" onClick={filterForToggle}>
+                <b>{placeholder}</b>
+                <span>{optionLabelSelected}</span>
+                <i className="fas fa-chevron-down"></i>
+            </div>
+            <ul>
+                {options.map((option, index) => (
+                    <Option
+                        key={option.value + index}
+                        id={"filter-" + option.value + index}
+                        option={option}
+                        isOptionSelected={isSelected}
+                        selectFilter={filterForHandleSelect}
+                    />
+                ))}
+            </ul>
+        </div>
+    );
+}
+
+Option.propTypes = null;
+
+function Option({ id, option, isOptionSelected, selectFilter }) {
+    return (
+        <li>
+            <input type="radio" name="filter" value={option.value} id={id} checked={isOptionSelected(option.value)} onChange={selectFilter} />
+            <label htmlFor={id}>{option.label}</label>
         </li>
     );
 }

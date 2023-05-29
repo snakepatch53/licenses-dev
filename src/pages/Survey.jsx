@@ -1,22 +1,43 @@
 import "./Survey.css";
-import { useEffect, useState } from "react";
 import Search from "../components/Search";
-import { select as selectSurvey } from "../api/survey";
+
+import ItemsSurvey from "../components/ItemsSurvey";
+import { useFilter, useSearch } from "../hooks/search";
+import { useResult } from "../hooks/survey";
 
 const filters = [
+    { value: "question", label: "Pregunta", db_name: "survey_question" },
+    { value: "answer", label: "Respuesta", db_name: "survey_answer" },
+    { value: "all", label: "Todos", db_name: "all" },
+];
+
+const limits = [
+    { value: 10, label: "10" },
+    { value: 20, label: "20" },
+    { value: 30, label: "30" },
+    { value: 40, label: "40" },
+    { value: 50, label: "50" },
     { value: "all", label: "Todos" },
-    { value: "question", label: "Pregunta" },
-    { value: "answer", label: "Respuesta" },
 ];
 
 export default function Survey() {
-    const [surveys, setSurveys] = useState([]);
-    useEffect(() => {
-        selectSurvey().then((response) => {
-            console.log(response);
-            setSurveys(response);
-        });
-    }, []);
+    const { valueSearch, handleSearch } = useSearch();
+
+    const [filterSelectedLabel, filterSelected, filterOnSelection, isFilterSelected] = useFilter({
+        defaultLabel: filters[0].label,
+        defaultFilter: filters[0].value,
+    });
+    const [limitSelectedLabel, limitSelected, limitOnSelection, isLimitSelected] = useFilter({
+        defaultLabel: limits[0].label,
+        defaultFilter: limits[0].value,
+    });
+    const { surveys } = useResult({
+        filters,
+        selectedFilter: filterSelected,
+        selectedLimit: limitSelected,
+        valueSearch,
+    });
+
     return (
         <>
             <div className="container">
@@ -26,7 +47,18 @@ export default function Survey() {
                 <div className="content">
                     <div className="head">
                         <h2>Survey</h2>
-                        <Search filters={filters} />
+                        <Search
+                            limits={limits}
+                            limitSelectedLabel={limitSelectedLabel}
+                            limitOnSelection={limitOnSelection}
+                            isLimitSelected={isLimitSelected}
+                            filters={filters}
+                            filterSelectedLabel={filterSelectedLabel}
+                            filterOnSelection={filterOnSelection}
+                            isFilterSelected={isFilterSelected}
+                            handleSearch={handleSearch}
+                            valueSearch={valueSearch}
+                        />
                         <div className="new">
                             <button>
                                 <i className="fas fa-plus"></i>
@@ -35,51 +67,10 @@ export default function Survey() {
                         </div>
                     </div>
                     <div className="data">
-                        <ul>
-                            {surveys.slice(0, 20).map((survey) => (
-                                <Item key={survey["survey_id"]} info={survey} />
-                            ))}
-                        </ul>
+                        <ItemsSurvey surveys={surveys} limit={limitSelected} />
                     </div>
                 </div>
             </div>
         </>
-    );
-}
-
-Item.propTypes = null;
-
-function Item({ info }) {
-    const { survey_question, survey_answer, survey_image_url } = info;
-    return (
-        <li>
-            <div className="info">
-                <div className="question">
-                    <p>
-                        <b>Pregunta: </b>
-                        {survey_question}
-                    </p>
-                </div>
-                <div className="answer">
-                    <p>
-                        <b>Respuesta: </b>
-                        {survey_answer}
-                    </p>
-                </div>
-            </div>
-            {survey_image_url && (
-                <div className="image">
-                    <img src={survey_image_url} alt="Survey" />
-                </div>
-            )}
-            <div className="actions">
-                <button className="edit">
-                    <i className="fas fa-edit"></i>
-                </button>
-                <button className="dell">
-                    <i className="fas fa-trash"></i>
-                </button>
-            </div>
-        </li>
     );
 }
